@@ -56,6 +56,16 @@ passport.use(
                 responseCode: emailError.responseCode
             });
         }
+        } else {
+          const googlePhoto = profile.photos?.[0]?.value;
+          if (!user.profilePic && googlePhoto) {
+            user.profilePic = googlePhoto;
+            try {
+              await user.save();
+            } catch (saveErr) {
+              console.error('Failed to save backfilled profilePic:', saveErr);
+            }
+          }
         }
 
         return done(null, user);

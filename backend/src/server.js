@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
 import session from "express-session";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
@@ -13,7 +14,9 @@ import { app, server } from "./lib/socket.js";
 import "./lib/passport.js";
 import passport from "passport";
 
-const __dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "../../");
 
 const PORT = ENV.PORT || 3000;
 
@@ -37,10 +40,10 @@ app.use("/api/groups", groupRoutes);
 
 // make ready for deployment
 if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "frontend", "dist")));
-  app.use((_, res) => {
-    res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-  })
+  app.use(express.static(path.join(PROJECT_ROOT, "frontend", "dist")));
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "frontend", "dist", "index.html"));
+  });
 }
 
 server.listen(PORT, () => {

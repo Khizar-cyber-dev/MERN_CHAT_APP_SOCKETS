@@ -24,7 +24,11 @@ function SignUpPage() {
               <div className="w-full max-w-md">
                 {/* HEADING TEXT */}
                 <div className="text-center mb-8">
-                  <MessageCircleIcon className="w-12 h-12 mx-auto text-slate-400 mb-4" />
+                  <img
+                    src="/logoImage.png"
+                    alt="Logo"
+                    className="mx-auto mb-4 w-28 sm:w-32 md:w-36 object-contain rounded-full bg-white p-1 md:p-1 ring-1 ring-slate-700/50 shadow-md"
+                  />
                   <h2 className="text-2xl font-bold text-slate-200 mb-2">Create Account</h2>
                   <p className="text-slate-400">Sign up for a new account</p>
                 </div>
@@ -97,7 +101,7 @@ function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => (window.location.href = googleAuthUrl)}
-                    className="auth-btn bg-white text-slate-900 hover:bg-slate-100 flex items-center justify-center gap-2"
+                    className="w-full rounded-lg py-2.5 font-medium bg-white text-slate-900 hover:bg-slate-200 focus:ring-2 focus:ring-slate-300 transition-colors flex items-center justify-center gap-2"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5">
                       <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c10 0 19-7.3 19-20 0-1.3-.1-2.5-.4-3.5z"/>
