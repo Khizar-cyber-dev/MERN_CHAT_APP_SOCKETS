@@ -39,15 +39,8 @@ export const signup = async (req, res) => {
       const savedUser = await newUser.save();
       generateToken(savedUser._id, res);
 
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
-      });
-
       try {
-            await transporter.sendMail(mailOptions(newUser));
+          await transporter.sendMail(mailOptions(newUser));
         } catch (emailError) {
             console.error('Email sending failed:', emailError);
             console.error('Email error details:', {
@@ -57,6 +50,13 @@ export const signup = async (req, res) => {
                 responseCode: emailError.responseCode
             });
         }
+
+      res.status(201).json({
+        _id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        profilePic: newUser.profilePic,
+      });
     } else {
       res.status(400).json({ message: "Invalid user data" });
     }

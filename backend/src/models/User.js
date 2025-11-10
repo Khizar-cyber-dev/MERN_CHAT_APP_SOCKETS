@@ -13,10 +13,20 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.provider; // only require password for non-OAuth users
+      },
       minlength: 6,
     },
     profilePic: {
+      type: String,
+      default: "",
+    },
+    provider: {
+      type: String,
+      default: "",
+    },
+    providerId: {
       type: String,
       default: "",
     },
