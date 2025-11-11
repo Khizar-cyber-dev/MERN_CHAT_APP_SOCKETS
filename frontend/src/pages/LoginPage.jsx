@@ -8,7 +8,7 @@ function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const { login, isLoggingIn } = useAuthStore();
   const googleAuthUrl = (import.meta.env.MODE === "development" ? "http://localhost:3000" : "") + "/api/auth/google";
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     login(formData);
@@ -75,6 +75,12 @@ function LoginPage() {
                       "Sign In"
                     )}
                   </button>
+
+                  <div className="flex items-center gap-3 my-2">
+                    <div className="h-px bg-slate-700 flex-1" />
+                    <span className="text-slate-400 text-sm">or</span>
+                    <div className="h-px bg-slate-700 flex-1" />
+                  </div>
 
                   <button
                     type="button"
