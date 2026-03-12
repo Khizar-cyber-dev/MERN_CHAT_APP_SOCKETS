@@ -83,8 +83,6 @@ export const getChatPartners = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    // find all the messages where the logged-in user is either sender or receiver
-    // exclude group messages (receiverId is null in group messages)
     const messages = await Message.find({
       $and: [
         { receiverId: { $ne: null } },

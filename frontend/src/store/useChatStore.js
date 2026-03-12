@@ -16,6 +16,7 @@ export const useChatStore = create((set, get) => ({
   isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
   isPartnerTyping: false,
   groupTypingUsers: [],
+  lastSeen: {},
 
   // =====================
   // General Actions
@@ -49,6 +50,14 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/messages/contacts");
       set({ allContacts: res.data });
+      // Populate lastSeen from fetched contacts
+      const lastSeenData = {};
+      res.data.forEach(user => {
+        if (user.lastSeen) {
+          lastSeenData[user._id] = user.lastSeen;
+        }
+      });
+      set(state => ({ lastSeen: { ...state.lastSeen, ...lastSeenData } }));
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch contacts");
     } finally {
@@ -61,6 +70,14 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/messages/chats");
       set({ chats: res.data });
+      // Populate lastSeen from fetched chats
+      const lastSeenData = {};
+      res.data.forEach(user => {
+        if (user.lastSeen) {
+          lastSeenData[user._id] = user.lastSeen;
+        }
+      });
+      set(state => ({ lastSeen: { ...state.lastSeen, ...lastSeenData } }));
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to fetch chats");
     } finally {
@@ -118,7 +135,7 @@ export const useChatStore = create((set, get) => ({
           : m
       );
       set({ messages: updated });
-    } catch (_) {}
+    } catch (_) { }
   },
 
   markGroupMessagesAsSeen: async (groupId) => {
@@ -131,15 +148,15 @@ export const useChatStore = create((set, get) => ({
       const updated = get().messages.map((m) =>
         messageIds.includes(m._id)
           ? {
-              ...m,
-              seenBy: Array.isArray(m.seenBy)
-                ? Array.from(new Set([...m.seenBy, authUser._id]))
-                : [authUser._id],
-            }
+            ...m,
+            seenBy: Array.isArray(m.seenBy)
+              ? Array.from(new Set([...m.seenBy, authUser._id]))
+              : [authUser._id],
+          }
           : m
       );
       set({ messages: updated });
-    } catch (_) {}
+    } catch (_) { }
   },
 
   // =====================
@@ -242,7 +259,7 @@ export const useChatStore = create((set, get) => ({
       if (isSoundEnabled) {
         const sound = new Audio("/sounds/notification.mp3");
         sound.currentTime = 0;
-        sound.play().catch(() => {});
+        sound.play().catch(() => { });
       }
     });
 
@@ -281,7 +298,7 @@ export const useChatStore = create((set, get) => ({
       if (isSoundEnabled) {
         const sound = new Audio("/sounds/notification.mp3");
         sound.currentTime = 0;
-        sound.play().catch(() => {});
+        sound.play().catch(() => { });
       }
     });
 
@@ -326,5 +343,21 @@ export const useChatStore = create((set, get) => ({
     ["newGroupMessage", "groupMessagesSeen", "typing", "stopTyping"].forEach(
       (ev) => socket.off(ev)
     );
+  },
+
+  subscribeToLastSeen: () => {
+    const socket = useAuthStore.getState().socket;
+
+    // Remove existing listener to avoid duplicates
+    socket.off("lastSeen");
+
+    socket.on("lastSeen", ({ userId, lastSeen }) => {
+      set((state) => ({
+        lastSeen: {
+          ...state.lastSeen,
+          [userId]: lastSeen,
+        },
+      }));
+    });
   },
 }));

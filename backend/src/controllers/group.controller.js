@@ -10,13 +10,13 @@ export const createGroup = async (req, res) => {
 
     const uniqueMembers = Array.from(new Set([creatorId.toString(), ...members.map(String)]));
 
-    let avatarUrl = "/group.png"; // default placeholder, frontend also falls back to this
+    let avatarUrl = "/group.png";
     if (avatar) {
       try {
         const upload = await cloudinary.uploader.upload(avatar);
         avatarUrl = upload.secure_url;
       } catch (e) {
-       
+        console.error("Error uploading avatar:", e.message);
       }
     }
 

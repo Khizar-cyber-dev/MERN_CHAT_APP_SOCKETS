@@ -4,6 +4,7 @@ import express from "express";
 import { ENV } from "./env.js";
 import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
 import Group from "../models/Group.js";
+import User from "../models/User.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -59,9 +60,20 @@ io.on("connection", async (socket) => {
     if (groupId) io.to(groupId).emit("stopTyping", { userId });
   });
 
-  socket.on("disconnect", () => {
+  const disconnectedUserId = socket.user._id;
+
+  socket.on("disconnect", async () => {
     console.log("A user disconnected", socket.user.fullName);
-    delete userSocketMap[userId];
+    const lastSeenTime = new Date();
+
+    try {
+      await User.findByIdAndUpdate(disconnectedUserId, { lastSeen: lastSeenTime });
+    } catch (error) {
+      console.error("Error updating lastSeen:", error);
+    }
+
+    io.emit("lastSeen", { userId: disconnectedUserId, lastSeen: lastSeenTime.toISOString() });
+    delete userSocketMap[disconnectedUserId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });

@@ -11,6 +11,8 @@ function ChatHeader() {
     setSelectedGroup,
     isPartnerTyping,
     groupTypingUsers,
+    lastSeen,
+    subscribeToLastSeen
   } = useChatStore();
   const { onlineUsers, authUser } = useAuthStore();
   const isOnline = selectedUser ? onlineUsers.includes(selectedUser._id) : false;
@@ -22,6 +24,7 @@ function ChatHeader() {
         else setSelectedUser(null);
       }
     };
+    subscribeToLastSeen();
 
     window.addEventListener("keydown", handleEscKey);
 
@@ -45,7 +48,14 @@ function ChatHeader() {
             <div>
               <h3 className="text-slate-200 font-medium">{selectedUser.fullName}</h3>
               <p className="text-slate-400 text-sm">
-                {isPartnerTyping ? "typing…" : isOnline ? "Online" : "Offline"}
+                {isPartnerTyping
+                  ? "typing…"
+                  : isOnline
+                    ? "Online"
+                    : lastSeen[selectedUser._id] // Check if we have a lastSeen timestamp
+                      ? `Last seen ${new Date(lastSeen[selectedUser._id]).toLocaleString()}`
+                      : "Offline" // Fallback if no lastSeen is available
+                }
               </p>
             </div>
           </>
